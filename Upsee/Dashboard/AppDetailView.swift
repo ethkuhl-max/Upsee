@@ -5,17 +5,25 @@ struct AppDetailView: View {
     @Bindable var app: AppEntity
     @Environment(\.modelContext) private var modelContext
 
+    @Query private var timeEntries: [TimeEntry]
+
     @State private var addingRoadmap = false
     @State private var addingRelease = false
     @State private var addingGoal = false
     @State private var editingMeta = false
     @State private var repoHealth: RepoHealthReport?
     @State private var refreshingRepo = false
+    @State private var logSheet: LogTarget?
+
+    private var decisionRec: AppDecisionRecommendation {
+        AppDecisionEngine.recommend(app: app, timeEntries: timeEntries)
+    }
 
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 28) {
                 header
+                decisionSection
                 metricsRow
                 if app.repoPath != nil {
                     repoSection
@@ -26,6 +34,9 @@ struct AppDetailView: View {
             }
             .padding(28)
             .frame(maxWidth: 980, alignment: .leading)
+        }
+        .sheet(item: $logSheet) { target in
+            LogDecisionSheet(target: target).frame(minWidth: 520, minHeight: 440)
         }
         .task(id: app.repoPath) { await loadRepoHealth() }
         .toolbar {
@@ -68,6 +79,14 @@ struct AppDetailView: View {
                     .font(.caption.monospaced())
                     .foregroundStyle(.tertiary)
             }
+        }
+    }
+
+    private var decisionSection: some View {
+        SectionShell(title: "Recommendation") {
+            AppDecisionCard(rec: decisionRec, onLog: {
+                logSheet = .app(name: app.name, recommendation: decisionRec.verdict.displayName)
+            })
         }
     }
 

@@ -21,6 +21,7 @@ struct MainView: View {
         switch section ?? .dashboard {
         case .overview: PortfolioOverviewView()
         case .dashboard: DashboardView()
+        case .apps: AppsView()
         case .briefing: BriefingView()
         case .planning: PlanningView()
         case .health: HealthView()
@@ -32,13 +33,14 @@ struct MainView: View {
 }
 
 enum UpseeSection: String, Hashable, CaseIterable, Identifiable {
-    case overview, dashboard, briefing, planning, health, wealth, decisions, time
+    case overview, dashboard, apps, briefing, planning, health, wealth, decisions, time
     var id: String { rawValue }
 
     var label: String {
         switch self {
         case .overview: return "Overview"
         case .dashboard: return "Dashboard"
+        case .apps: return "Apps"
         case .briefing: return "Briefing"
         case .planning: return "Planning"
         case .health: return "Health"
@@ -52,6 +54,7 @@ enum UpseeSection: String, Hashable, CaseIterable, Identifiable {
         switch self {
         case .overview: return "chart.pie"
         case .dashboard: return "rectangle.3.group"
+        case .apps: return "square.grid.2x2"
         case .briefing: return "sparkles.rectangle.stack"
         case .planning: return "chart.line.uptrend.xyaxis"
         case .health: return "heart.text.square"

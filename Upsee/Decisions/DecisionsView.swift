@@ -42,7 +42,6 @@ struct DecisionsView: View {
         ScrollView {
             VStack(alignment: .leading, spacing: 28) {
                 header
-                appsSection
                 jobsSection
                 dealsSection
                 decisionLogSection
@@ -58,9 +57,9 @@ struct DecisionsView: View {
 
     private var header: some View {
         VStack(alignment: .leading, spacing: 6) {
-            Text("What does the math say?")
+            Text("Jobs & deals")
                 .font(.title3.weight(.semibold))
-            Text("Mechanical recommendations based on revenue, hours logged, and analysis. The numbers don't account for joy or strategic optionality — log a counter-decision when they're wrong, and the log will show your hit rate over time.")
+            Text("Mechanical recommendations for non-app decisions. App-level decisions live on the Apps page. Log a counter-decision when the math is wrong — the log shows your hit rate over time.")
                 .font(.callout)
                 .foregroundStyle(.secondary)
                 .frame(maxWidth: 720, alignment: .leading)
