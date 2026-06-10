@@ -25,13 +25,14 @@ struct MainView: View {
         case .planning: PlanningView()
         case .health: HealthView()
         case .wealth: WealthView()
+        case .decisions: DecisionsView()
         case .time: TimeView()
         }
     }
 }
 
 enum UpseeSection: String, Hashable, CaseIterable, Identifiable {
-    case overview, dashboard, briefing, planning, health, wealth, time
+    case overview, dashboard, briefing, planning, health, wealth, decisions, time
     var id: String { rawValue }
 
     var label: String {
@@ -42,6 +43,7 @@ enum UpseeSection: String, Hashable, CaseIterable, Identifiable {
         case .planning: return "Planning"
         case .health: return "Health"
         case .wealth: return "Wealth"
+        case .decisions: return "Decisions"
         case .time: return "Time"
         }
     }
@@ -54,6 +56,7 @@ enum UpseeSection: String, Hashable, CaseIterable, Identifiable {
         case .planning: return "chart.line.uptrend.xyaxis"
         case .health: return "heart.text.square"
         case .wealth: return "banknote"
+        case .decisions: return "scale.3d"
         case .time: return "clock.arrow.circlepath"
         }
     }

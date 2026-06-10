@@ -103,7 +103,7 @@ private struct AccountRow: View {
                     .frame(maxWidth: 220)
                 Text("Headroom: \(currency(account.headroom))")
                     .font(.caption.monospacedDigit())
-                    .foregroundStyle(account.headroom > 0 ? Color.secondary : Color.green)
+                    .foregroundStyle(account.headroom > 0 ? AnyShapeStyle(.secondary) : AnyShapeStyle(Color.green))
             }
         }
         .padding(10)
