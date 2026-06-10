@@ -1,0 +1,70 @@
+name: Upsee
+options:
+  bundleIdPrefix: com.kuhlman
+  deploymentTarget:
+    macOS: "26.0"
+  createIntermediateGroups: true
+settings:
+  base:
+    SWIFT_VERSION: "5.0"
+    MARKETING_VERSION: "0.1.0"
+    CURRENT_PROJECT_VERSION: "1"
+    GENERATE_INFOPLIST_FILE: NO
+    DEVELOPMENT_TEAM: A4SBBSXT95
+    CODE_SIGN_STYLE: Automatic
+targets:
+  Upsee:
+    type: application
+    platform: macOS
+    deploymentTarget: "26.0"
+    sources:
+      - path: Upsee
+        excludes:
+          - "**/*.example"
+          - "**/*.entitlements"
+    entitlements:
+      path: Upsee/Upsee.entitlements
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.kuhlman.upsee
+        PRODUCT_NAME: Upsee
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+        ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME: AccentColor
+        ENABLE_HARDENED_RUNTIME: YES
+        COMBINE_HIDPI_IMAGES: YES
+        LSMINIMUMSYSTEMVERSION: "26.0"
+    info:
+      path: Upsee/Resources/Info.plist
+      properties:
+        CFBundleDisplayName: Upsee
+        CFBundleShortVersionString: "0.1.0"
+        LSApplicationCategoryType: public.app-category.finance
+        ITSAppUsesNonExemptEncryption: false
+        NSHumanReadableCopyright: "© 2026 Kuhlman & Co."
+  UpseeTests:
+    type: bundle.unit-test
+    platform: macOS
+    deploymentTarget: "26.0"
+    sources:
+      - path: Tests
+    dependencies:
+      - target: Upsee
+    settings:
+      base:
+        GENERATE_INFOPLIST_FILE: YES
+        PRODUCT_BUNDLE_IDENTIFIER: com.kuhlman.upsee.tests
+        TEST_HOST: "$(BUILT_PRODUCTS_DIR)/Upsee.app/Contents/MacOS/Upsee"
+        BUNDLE_LOADER: "$(TEST_HOST)"
+schemes:
+  Upsee:
+    build:
+      targets:
+        Upsee: all
+        UpseeTests: [test]
+    test:
+      targets:
+        - UpseeTests
+    run:
+      config: Debug
+    archive:
+      config: Release
