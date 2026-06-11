@@ -20,6 +20,7 @@ struct MainView: View {
     private var detail: some View {
         switch section ?? .dashboard {
         case .overview: PortfolioOverviewView()
+        case .clients: ClientsView()
         case .dashboard: DashboardView()
         case .apps: AppsView()
         case .briefing: BriefingView()
@@ -27,18 +28,20 @@ struct MainView: View {
         case .health: HealthView()
         case .wealth: WealthView()
         case .decisions: DecisionsView()
+        case .activity: ActivityFeedView()
         case .time: TimeView()
         }
     }
 }
 
 enum UpseeSection: String, Hashable, CaseIterable, Identifiable {
-    case overview, dashboard, apps, briefing, planning, health, wealth, decisions, time
+    case overview, clients, dashboard, apps, briefing, planning, health, wealth, decisions, activity, time
     var id: String { rawValue }
 
     var label: String {
         switch self {
         case .overview: return "Overview"
+        case .clients: return "Clients"
         case .dashboard: return "Dashboard"
         case .apps: return "Apps"
         case .briefing: return "Briefing"
@@ -46,6 +49,7 @@ enum UpseeSection: String, Hashable, CaseIterable, Identifiable {
         case .health: return "Health"
         case .wealth: return "Wealth"
         case .decisions: return "Decisions"
+        case .activity: return "Activity"
         case .time: return "Time"
         }
     }
@@ -53,6 +57,7 @@ enum UpseeSection: String, Hashable, CaseIterable, Identifiable {
     var systemImage: String {
         switch self {
         case .overview: return "chart.pie"
+        case .clients: return "person.2"
         case .dashboard: return "rectangle.3.group"
         case .apps: return "square.grid.2x2"
         case .briefing: return "sparkles.rectangle.stack"
@@ -60,6 +65,7 @@ enum UpseeSection: String, Hashable, CaseIterable, Identifiable {
         case .health: return "heart.text.square"
         case .wealth: return "banknote"
         case .decisions: return "scale.3d"
+        case .activity: return "waveform.path.ecg"
         case .time: return "clock.arrow.circlepath"
         }
     }

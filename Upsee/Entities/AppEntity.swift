@@ -13,6 +13,7 @@ final class AppEntity {
     var lastShippedAt: Date?
     var marketingNote: String
     var techDebtNote: String
+    var targetHoursPerWeek: Int = 0
     var createdAt: Date
     var updatedAt: Date
 

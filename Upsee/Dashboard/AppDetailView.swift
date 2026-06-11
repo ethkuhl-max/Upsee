@@ -25,12 +25,14 @@ struct AppDetailView: View {
                 header
                 decisionSection
                 metricsRow
+                weeklySection
                 if app.repoPath != nil {
                     repoSection
                 }
                 goalsSection
                 roadmapSection
                 releasesSection
+                journalSectionView
             }
             .padding(28)
             .frame(maxWidth: 980, alignment: .leading)
@@ -87,6 +89,18 @@ struct AppDetailView: View {
             AppDecisionCard(rec: decisionRec, onLog: {
                 logSheet = .app(name: app.name, recommendation: decisionRec.verdict.displayName)
             })
+        }
+    }
+
+    private var weeklySection: some View {
+        SectionShell(title: "Weekly focus") {
+            WeeklyCommitmentSection(app: app, timeEntries: timeEntries)
+        }
+    }
+
+    private var journalSectionView: some View {
+        SectionShell(title: "Journal") {
+            JournalSection(entityKind: "app", entityLabel: app.name)
         }
     }
 

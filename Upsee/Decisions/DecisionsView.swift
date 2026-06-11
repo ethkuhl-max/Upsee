@@ -12,6 +12,12 @@ struct DecisionsView: View {
     @Query(sort: \DecisionEntity.createdAt, order: .reverse) private var decisionLog: [DecisionEntity]
 
     @State private var logSheet: LogTarget?
+    @State private var reviewingDecision: DecisionEntity?
+
+    private var staleDecisions: [DecisionEntity] {
+        let cutoff = Calendar.current.date(byAdding: .day, value: -30, to: Date()) ?? Date()
+        return decisionLog.filter { $0.outcome.isEmpty && $0.createdAt <= cutoff }
+    }
 
     private var personalEntity: PersonalEntity? { personal.first }
 
@@ -42,6 +48,7 @@ struct DecisionsView: View {
         ScrollView {
             VStack(alignment: .leading, spacing: 28) {
                 header
+                RetrospectiveBanner(staleDecisions: staleDecisions, reviewing: $reviewingDecision)
                 jobsSection
                 dealsSection
                 decisionLogSection
@@ -52,6 +59,10 @@ struct DecisionsView: View {
         .sheet(item: $logSheet) { target in
             LogDecisionSheet(target: target)
                 .frame(minWidth: 520, minHeight: 440)
+        }
+        .sheet(item: $reviewingDecision) { decision in
+            RetrospectiveOutcomeSheet(decision: decision)
+                .frame(minWidth: 520, minHeight: 420)
         }
     }
 

@@ -22,6 +22,9 @@ enum UpseeStore {
         TaxPayment.self,
         RetirementAccount.self,
         DecisionEntity.self,
+        Client.self,
+        JournalEntry.self,
+        WeeklyCommitment.self,
     ])
 
     static let modelContainer: ModelContainer = {

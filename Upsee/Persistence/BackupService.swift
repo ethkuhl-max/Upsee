@@ -1,11 +1,11 @@
 import Foundation
 import SwiftData
 
-/// A portable JSON snapshot of the user's core Upsee data. Operator-tooling entities
-/// (roadmap, releases, briefings, time entries) are intentionally excluded — this covers
-/// the portfolio, deals + analyses, planning, and the balance sheet.
+/// A portable JSON snapshot of the user's core Upsee data — portfolio, deals + analyses,
+/// planning, balance sheet, advisor clients, and wellbeing/habits. Operator-tooling
+/// entities (roadmap, releases, briefings, time entries) are intentionally excluded.
 struct UpseeBackup: Codable {
-    var version: Int = 1
+    var version: Int = 2
     var exportedAt: Date
     var apps: [AppDTO]
     var jobs: [JobDTO]
@@ -15,6 +15,15 @@ struct UpseeBackup: Codable {
     var deals: [DealDTO]
     var diligence: [DiligenceDTO]
     var balanceSheet: [BalanceSheetDTO]
+    // Added in v2 — optional so v1 backups still decode.
+    var clients: [ClientDTO]?
+    var wellbeing: [WellbeingDTO]?
+    var habits: [HabitDTO]?
+    // Added in v3.
+    var retirementAccounts: [RetirementDTO]?
+    var netWorthSnapshots: [SnapshotDTO]?
+    var taxPayments: [TaxPaymentDTO]?
+    var decisions: [DecisionDTO]?
 
     struct AppDTO: Codable {
         var name: String; var summary: String; var statusRaw: String; var repoPath: String?
@@ -54,6 +63,44 @@ struct UpseeBackup: Codable {
     struct BalanceSheetDTO: Codable {
         var name: String; var amount: Decimal; var isAsset: Bool; var categoryRaw: String
         var apr: Double; var minimumPayment: Decimal; var createdAt: Date; var updatedAt: Date
+    }
+    struct ClientDTO: Codable {
+        var name: String; var email: String; var householdNote: String; var statusRaw: String
+        var aum: Decimal; var feePercent: Double; var riskScore: Int
+        var monthlyIncome: Decimal; var monthlyExpenses: Decimal
+        var reviewCadenceMonths: Int; var lastReviewDate: Date?; var notes: String
+        var createdAt: Date; var updatedAt: Date
+        var lineItems: [ClientLineItem]; var meetings: [ClientMeeting]
+        var riskAnswers: [Int]; var goals: [ClientGoal]
+    }
+    struct WellbeingDTO: Codable {
+        var date: Date; var energy: Int; var stress: Int; var sleepHours: Double
+        var exerciseMinutes: Int; var note: String
+    }
+    struct HabitDTO: Codable {
+        var name: String; var systemImage: String; var sortIndex: Int; var createdAt: Date
+        var completionDayKeys: [String]
+    }
+    struct RetirementDTO: Codable {
+        var name: String; var kindRaw: String; var currentBalance: Decimal
+        var contributionsYTD: Decimal; var employerMatchYTD: Decimal; var note: String
+        var createdAt: Date; var updatedAt: Date
+    }
+    struct SnapshotDTO: Codable {
+        var date: Date; var totalAssets: Decimal; var totalLiabilities: Decimal
+        var cashAmount: Decimal; var investmentsAmount: Decimal; var retirementAmount: Decimal
+        var realEstateAmount: Decimal; var vehicleAmount: Decimal; var otherAssetAmount: Decimal
+        var creditCardAmount: Decimal; var studentLoanAmount: Decimal; var autoLoanAmount: Decimal
+        var mortgageAmount: Decimal; var otherLiabilityAmount: Decimal; var note: String; var createdAt: Date
+    }
+    struct TaxPaymentDTO: Codable {
+        var paidAt: Date; var amount: Decimal; var quarterNumber: Int; var taxYear: Int
+        var kindRaw: String; var note: String; var createdAt: Date
+    }
+    struct DecisionDTO: Codable {
+        var createdAt: Date; var kindRaw: String; var targetLabel: String
+        var recommendation: String; var userChoice: String; var rationale: String
+        var outcome: String; var outcomeUpdatedAt: Date?
     }
 }
 
@@ -100,6 +147,43 @@ enum BackupService {
             balanceSheet: fetch(context, BalanceSheetItem.self).map {
                 .init(name: $0.name, amount: $0.amount, isAsset: $0.isAsset, categoryRaw: $0.categoryRaw,
                       apr: $0.apr, minimumPayment: $0.minimumPayment, createdAt: $0.createdAt, updatedAt: $0.updatedAt)
+            },
+            clients: fetch(context, Client.self).map {
+                .init(name: $0.name, email: $0.email, householdNote: $0.householdNote, statusRaw: $0.statusRaw,
+                      aum: $0.aum, feePercent: $0.feePercent, riskScore: $0.riskScore,
+                      monthlyIncome: $0.monthlyIncome, monthlyExpenses: $0.monthlyExpenses,
+                      reviewCadenceMonths: $0.reviewCadenceMonths, lastReviewDate: $0.lastReviewDate, notes: $0.notes,
+                      createdAt: $0.createdAt, updatedAt: $0.updatedAt,
+                      lineItems: $0.lineItems, meetings: $0.meetings, riskAnswers: $0.riskAnswers, goals: $0.goals)
+            },
+            wellbeing: fetch(context, WellbeingEntry.self).map {
+                .init(date: $0.date, energy: $0.energy, stress: $0.stress, sleepHours: $0.sleepHours,
+                      exerciseMinutes: $0.exerciseMinutes, note: $0.note)
+            },
+            habits: fetch(context, Habit.self).map {
+                .init(name: $0.name, systemImage: $0.systemImage, sortIndex: $0.sortIndex,
+                      createdAt: $0.createdAt, completionDayKeys: Array($0.completionDayKeys))
+            },
+            retirementAccounts: fetch(context, RetirementAccount.self).map {
+                .init(name: $0.name, kindRaw: $0.kindRaw, currentBalance: $0.currentBalance,
+                      contributionsYTD: $0.contributionsYTD, employerMatchYTD: $0.employerMatchYTD,
+                      note: $0.note, createdAt: $0.createdAt, updatedAt: $0.updatedAt)
+            },
+            netWorthSnapshots: fetch(context, NetWorthSnapshot.self).map {
+                .init(date: $0.date, totalAssets: $0.totalAssets, totalLiabilities: $0.totalLiabilities,
+                      cashAmount: $0.cashAmount, investmentsAmount: $0.investmentsAmount, retirementAmount: $0.retirementAmount,
+                      realEstateAmount: $0.realEstateAmount, vehicleAmount: $0.vehicleAmount, otherAssetAmount: $0.otherAssetAmount,
+                      creditCardAmount: $0.creditCardAmount, studentLoanAmount: $0.studentLoanAmount, autoLoanAmount: $0.autoLoanAmount,
+                      mortgageAmount: $0.mortgageAmount, otherLiabilityAmount: $0.otherLiabilityAmount, note: $0.note, createdAt: $0.createdAt)
+            },
+            taxPayments: fetch(context, TaxPayment.self).map {
+                .init(paidAt: $0.paidAt, amount: $0.amount, quarterNumber: $0.quarterNumber, taxYear: $0.taxYear,
+                      kindRaw: $0.kindRaw, note: $0.note, createdAt: $0.createdAt)
+            },
+            decisions: fetch(context, DecisionEntity.self).map {
+                .init(createdAt: $0.createdAt, kindRaw: $0.kindRaw, targetLabel: $0.targetLabel,
+                      recommendation: $0.recommendation, userChoice: $0.userChoice, rationale: $0.rationale,
+                      outcome: $0.outcome, outcomeUpdatedAt: $0.outcomeUpdatedAt)
             }
         )
         let encoder = JSONEncoder()
@@ -124,6 +208,13 @@ enum BackupService {
         deleteAll(context, DealEntity.self)
         deleteAll(context, DiligenceItem.self)
         deleteAll(context, BalanceSheetItem.self)
+        deleteAll(context, Client.self)
+        deleteAll(context, WellbeingEntry.self)
+        deleteAll(context, Habit.self)
+        deleteAll(context, RetirementAccount.self)
+        deleteAll(context, NetWorthSnapshot.self)
+        deleteAll(context, TaxPayment.self)
+        deleteAll(context, DecisionEntity.self)
 
         for dto in backup.apps {
             let e = AppEntity(name: dto.name, summary: dto.summary, repoPath: dto.repoPath,
@@ -177,6 +268,57 @@ enum BackupService {
                                      category: BalanceSheetCategory(rawValue: dto.categoryRaw) ?? .otherAsset,
                                      apr: dto.apr, minimumPayment: dto.minimumPayment)
             e.isAsset = dto.isAsset; e.createdAt = dto.createdAt; e.updatedAt = dto.updatedAt
+            context.insert(e)
+        }
+        for dto in backup.clients ?? [] {
+            let e = Client(name: dto.name, email: dto.email,
+                           status: ClientStatus(rawValue: dto.statusRaw) ?? .prospect,
+                           aum: dto.aum, feePercent: dto.feePercent, reviewCadenceMonths: dto.reviewCadenceMonths)
+            e.householdNote = dto.householdNote; e.riskScore = dto.riskScore
+            e.monthlyIncome = dto.monthlyIncome; e.monthlyExpenses = dto.monthlyExpenses
+            e.lastReviewDate = dto.lastReviewDate; e.notes = dto.notes
+            e.createdAt = dto.createdAt; e.updatedAt = dto.updatedAt
+            e.lineItems = dto.lineItems; e.meetings = dto.meetings; e.riskAnswers = dto.riskAnswers; e.goals = dto.goals
+            context.insert(e)
+        }
+        for dto in backup.wellbeing ?? [] {
+            let e = WellbeingEntry(date: dto.date, energy: dto.energy, stress: dto.stress,
+                                   sleepHours: dto.sleepHours, exerciseMinutes: dto.exerciseMinutes, note: dto.note)
+            context.insert(e)
+        }
+        for dto in backup.habits ?? [] {
+            let e = Habit(name: dto.name, systemImage: dto.systemImage, sortIndex: dto.sortIndex)
+            e.createdAt = dto.createdAt
+            e.completionDayKeys = Set(dto.completionDayKeys)
+            context.insert(e)
+        }
+        for dto in backup.retirementAccounts ?? [] {
+            let e = RetirementAccount(name: dto.name,
+                                      kind: RetirementAccountKind(rawValue: dto.kindRaw) ?? .traditionalIRA,
+                                      currentBalance: dto.currentBalance, contributionsYTD: dto.contributionsYTD,
+                                      employerMatchYTD: dto.employerMatchYTD)
+            e.note = dto.note; e.createdAt = dto.createdAt; e.updatedAt = dto.updatedAt
+            context.insert(e)
+        }
+        for dto in backup.netWorthSnapshots ?? [] {
+            let e = NetWorthSnapshot(date: dto.date, totalAssets: dto.totalAssets, totalLiabilities: dto.totalLiabilities,
+                                     cashAmount: dto.cashAmount, investmentsAmount: dto.investmentsAmount, retirementAmount: dto.retirementAmount,
+                                     realEstateAmount: dto.realEstateAmount, vehicleAmount: dto.vehicleAmount, otherAssetAmount: dto.otherAssetAmount,
+                                     creditCardAmount: dto.creditCardAmount, studentLoanAmount: dto.studentLoanAmount, autoLoanAmount: dto.autoLoanAmount,
+                                     mortgageAmount: dto.mortgageAmount, otherLiabilityAmount: dto.otherLiabilityAmount, note: dto.note)
+            e.createdAt = dto.createdAt
+            context.insert(e)
+        }
+        for dto in backup.taxPayments ?? [] {
+            let e = TaxPayment(paidAt: dto.paidAt, amount: dto.amount, quarterNumber: dto.quarterNumber,
+                               taxYear: dto.taxYear, kind: TaxPaymentKind(rawValue: dto.kindRaw) ?? .federal, note: dto.note)
+            e.createdAt = dto.createdAt
+            context.insert(e)
+        }
+        for dto in backup.decisions ?? [] {
+            let e = DecisionEntity(kind: DecisionKind(rawValue: dto.kindRaw) ?? .app, targetLabel: dto.targetLabel,
+                                   recommendation: dto.recommendation, userChoice: dto.userChoice, rationale: dto.rationale)
+            e.createdAt = dto.createdAt; e.outcome = dto.outcome; e.outcomeUpdatedAt = dto.outcomeUpdatedAt
             context.insert(e)
         }
 

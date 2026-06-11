@@ -9,7 +9,13 @@ enum ExportService {
 
     @MainActor
     static func pdfData(for analysis: Analysis) -> Data? {
-        let view = AnalysisPrintView(markdown: AnalysisMarkdown.render(analysis))
+        pdfData(markdown: AnalysisMarkdown.render(analysis))
+    }
+
+    /// Renders any Markdown document to a single tall PDF page.
+    @MainActor
+    static func pdfData(markdown: String) -> Data? {
+        let view = AnalysisPrintView(markdown: markdown)
         let renderer = ImageRenderer(content: view)
         renderer.proposedSize = ProposedViewSize(width: 612, height: nil)
 

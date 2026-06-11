@@ -94,6 +94,42 @@ enum DemoData {
         context.insert(deepWork)
         context.insert(workout)
 
+        // Advisor client roster
+        let doe = Client(name: "Jane & John Doe", email: "doe@example.com", status: .active, aum: 1_250_000, feePercent: 0.009, reviewCadenceMonths: 6)
+        doe.monthlyIncome = 22_000
+        doe.monthlyExpenses = 12_500
+        doe.lastReviewDate = cal.date(byAdding: .day, value: -200, to: Date())
+        doe.riskAnswers = [2, 3, 2, 2, 3, 2]
+        doe.riskScore = RiskProfileEngine.score(answers: doe.riskAnswers).score
+        doe.lineItems = [
+            ClientLineItem(name: "Brokerage", amount: 820_000, isAsset: true, category: "Investments"),
+            ClientLineItem(name: "401(k)", amount: 430_000, isAsset: true, category: "Retirement"),
+            ClientLineItem(name: "Cash", amount: 95_000, isAsset: true, category: "Cash"),
+            ClientLineItem(name: "Mortgage", amount: 380_000, isAsset: false, category: "Mortgage"),
+        ]
+        doe.meetings = [ClientMeeting(date: cal.date(byAdding: .day, value: -200, to: Date()) ?? Date(), summary: "Annual review — rebalanced to target")]
+        doe.goals = [
+            ClientGoal(name: "Retirement", targetAmount: 3_000_000, currentAmount: 1_345_000),
+            ClientGoal(name: "College fund", targetAmount: 250_000, currentAmount: 60_000, targetDate: cal.date(byAdding: .year, value: 8, to: Date())),
+        ]
+        context.insert(doe)
+
+        let chen = Client(name: "Mei Chen", email: "mei@example.com", status: .prospect, aum: 0, feePercent: 0.01, reviewCadenceMonths: 12)
+        chen.monthlyIncome = 14_000
+        chen.monthlyExpenses = 9_000
+        context.insert(chen)
+
+        let alvarez = Client(name: "Carlos Alvarez", email: "carlos@example.com", status: .active, aum: 640_000, feePercent: 0.011, reviewCadenceMonths: 12)
+        alvarez.monthlyIncome = 18_000
+        alvarez.monthlyExpenses = 11_000
+        alvarez.lastReviewDate = cal.date(byAdding: .month, value: -11, to: Date())
+        alvarez.lineItems = [
+            ClientLineItem(name: "Brokerage", amount: 410_000, isAsset: true, category: "Investments"),
+            ClientLineItem(name: "Cash", amount: 60_000, isAsset: true, category: "Cash"),
+            ClientLineItem(name: "Auto loan", amount: 22_000, isAsset: false, category: "Loan"),
+        ]
+        context.insert(alvarez)
+
         try? context.save()
     }
 
