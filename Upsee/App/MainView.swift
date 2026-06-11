@@ -29,6 +29,8 @@ struct MainView: View {
         case .wealth: WealthView()
         case .decisions: DecisionsView()
         case .activity: ActivityFeedView()
+        case .transactions: TransactionsView()
+        case .loans: LoansView()
         case .imports: ASCImportView()
         case .time: TimeView()
         }
@@ -36,7 +38,7 @@ struct MainView: View {
 }
 
 enum UpseeSection: String, Hashable, CaseIterable, Identifiable {
-    case overview, clients, dashboard, apps, briefing, planning, health, wealth, decisions, activity, imports, time
+    case overview, clients, dashboard, apps, briefing, planning, health, wealth, decisions, activity, transactions, loans, imports, time
     var id: String { rawValue }
 
     var label: String {
@@ -51,6 +53,8 @@ enum UpseeSection: String, Hashable, CaseIterable, Identifiable {
         case .wealth: return "Wealth"
         case .decisions: return "Decisions"
         case .activity: return "Activity"
+        case .transactions: return "Transactions"
+        case .loans: return "Loans"
         case .imports: return "Imports"
         case .time: return "Time"
         }
@@ -68,6 +72,8 @@ enum UpseeSection: String, Hashable, CaseIterable, Identifiable {
         case .wealth: return "banknote"
         case .decisions: return "scale.3d"
         case .activity: return "waveform.path.ecg"
+        case .transactions: return "list.bullet.rectangle.portrait"
+        case .loans: return "creditcard"
         case .imports: return "tray.and.arrow.down"
         case .time: return "clock.arrow.circlepath"
         }
