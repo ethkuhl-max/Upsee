@@ -26,6 +26,7 @@ struct AppDetailView: View {
                 decisionSection
                 metricsRow
                 weeklySection
+                costsSectionView
                 if app.repoPath != nil {
                     repoSection
                 }
@@ -101,6 +102,12 @@ struct AppDetailView: View {
     private var journalSectionView: some View {
         SectionShell(title: "Journal") {
             JournalSection(entityKind: "app", entityLabel: app.name)
+        }
+    }
+
+    private var costsSectionView: some View {
+        SectionShell(title: "Costs & net profit") {
+            CostsSection(app: app)
         }
     }
 

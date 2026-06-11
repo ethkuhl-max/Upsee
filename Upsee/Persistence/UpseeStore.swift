@@ -25,6 +25,8 @@ enum UpseeStore {
         Client.self,
         JournalEntry.self,
         WeeklyCommitment.self,
+        AppCost.self,
+        ImportLogEntry.self,
     ])
 
     static let modelContainer: ModelContainer = {
