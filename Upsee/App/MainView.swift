@@ -47,6 +47,7 @@ struct MainView: View {
         case .health: HealthView()
         case .wealth: WealthView()
         case .decisions: DecisionsView()
+        case .planner: PlannerView()
         case .activity: ActivityFeedView()
         case .transactions: TransactionsView()
         case .bills: BillsView()
@@ -58,7 +59,7 @@ struct MainView: View {
 }
 
 enum UpseeSection: String, Hashable, CaseIterable, Identifiable {
-    case overview, clients, dashboard, apps, briefing, planning, health, wealth, decisions, activity, transactions, bills, loans, imports, time
+    case overview, clients, dashboard, apps, briefing, planning, health, wealth, decisions, planner, activity, transactions, bills, loans, imports, time
     var id: String { rawValue }
 
     var label: String {
@@ -72,6 +73,7 @@ enum UpseeSection: String, Hashable, CaseIterable, Identifiable {
         case .health: return "Health"
         case .wealth: return "Wealth"
         case .decisions: return "Decisions"
+        case .planner: return "Planner"
         case .activity: return "Activity"
         case .transactions: return "Transactions"
         case .bills: return "Bills"
@@ -92,6 +94,7 @@ enum UpseeSection: String, Hashable, CaseIterable, Identifiable {
         case .health: return "heart.text.square"
         case .wealth: return "banknote"
         case .decisions: return "scale.3d"
+        case .planner: return "person.2.badge.gearshape"
         case .activity: return "waveform.path.ecg"
         case .transactions: return "list.bullet.rectangle.portrait"
         case .bills: return "calendar.badge.clock"
@@ -104,7 +107,7 @@ enum UpseeSection: String, Hashable, CaseIterable, Identifiable {
     /// Sections that hold sensitive financial data — surfaced as defaults in lock settings.
     var isSensitive: Bool {
         switch self {
-        case .wealth, .transactions, .loans, .planning, .clients, .decisions, .bills: return true
+        case .wealth, .transactions, .loans, .planning, .clients, .decisions, .bills, .planner: return true
         default: return false
         }
     }
