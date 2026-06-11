@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct MainView: View {
-    @State private var section: UpseeSection? = .dashboard
+    @State private var section: UpseeSection? = .overview
     @State private var showingLockSettings = false
     @Environment(LockManager.self) private var lockManager
 
@@ -15,11 +15,12 @@ struct MainView: View {
         } detail: {
             NavigationStack {
                 SectionLockGate(
-                    sectionRawValue: (section ?? .dashboard).rawValue,
-                    sectionLabel: (section ?? .dashboard).label
+                    sectionRawValue: (section ?? .overview).rawValue,
+                    sectionLabel: (section ?? .overview).label
                 ) {
                     detail
                 }
+                .background(UpseeBackdrop())
             }
         }
         .navigationSplitViewStyle(.balanced)
@@ -37,8 +38,8 @@ struct MainView: View {
 
     @ViewBuilder
     private var detail: some View {
-        switch section ?? .dashboard {
-        case .overview: PortfolioOverviewView()
+        switch section ?? .overview {
+        case .overview: HomeView(open: { section = $0 })
         case .clients: ClientsView()
         case .dashboard: DashboardView()
         case .apps: AppsView()
@@ -64,7 +65,7 @@ enum UpseeSection: String, Hashable, CaseIterable, Identifiable {
 
     var label: String {
         switch self {
-        case .overview: return "Overview"
+        case .overview: return "Home"
         case .clients: return "Clients"
         case .dashboard: return "Dashboard"
         case .apps: return "Apps"
@@ -85,7 +86,7 @@ enum UpseeSection: String, Hashable, CaseIterable, Identifiable {
 
     var systemImage: String {
         switch self {
-        case .overview: return "chart.pie"
+        case .overview: return "house.fill"
         case .clients: return "person.2"
         case .dashboard: return "rectangle.3.group"
         case .apps: return "square.grid.2x2"
@@ -111,6 +112,15 @@ enum UpseeSection: String, Hashable, CaseIterable, Identifiable {
         default: return false
         }
     }
+
+    /// Grouped sidebar layout. A nil title renders without a section header.
+    static let sidebarGroups: [(title: String?, sections: [UpseeSection])] = [
+        (nil, [.overview]),
+        ("Portfolio", [.dashboard, .apps, .clients, .decisions, .time]),
+        ("Money", [.wealth, .transactions, .bills, .loans, .planner, .planning]),
+        ("Insights", [.briefing, .activity, .health]),
+        ("Data", [.imports]),
+    ]
 }
 
 struct Sidebar: View {
@@ -122,27 +132,16 @@ struct Sidebar: View {
     var body: some View {
         VStack(spacing: 0) {
             List(selection: $selection) {
-                ForEach(UpseeSection.allCases) { section in
-                    HStack(spacing: 6) {
-                        Label(section.label, systemImage: section.systemImage)
-                        if lockManager.isSectionLocked(section.rawValue) {
-                            Spacer()
-                            Image(systemName: "lock.fill")
-                                .font(.caption2)
-                                .foregroundStyle(.tertiary)
-                        }
-                    }
-                    .tag(section)
-                    .contextMenu {
-                        if section.isSensitive {
-                            Button {
-                                lockManager.toggleSectionLock(section.rawValue)
-                            } label: {
-                                Label(
-                                    lockManager.isSectionLocked(section.rawValue) ? "Stop locking section" : "Always lock section",
-                                    systemImage: "lock"
-                                )
+                ForEach(Array(UpseeSection.sidebarGroups.enumerated()), id: \.offset) { _, group in
+                    if let title = group.title {
+                        Section(title) {
+                            ForEach(group.sections) { section in
+                                row(for: section)
                             }
+                        }
+                    } else {
+                        ForEach(group.sections) { section in
+                            row(for: section)
                         }
                     }
                 }
@@ -151,6 +150,32 @@ struct Sidebar: View {
             .navigationTitle("Upsee")
 
             LockControlsFooter(onOpenSettings: onOpenLockSettings)
+        }
+    }
+
+    @ViewBuilder
+    private func row(for section: UpseeSection) -> some View {
+        HStack(spacing: 6) {
+            Label(section.label, systemImage: section.systemImage)
+            if lockManager.isSectionLocked(section.rawValue) {
+                Spacer()
+                Image(systemName: "lock.fill")
+                    .font(.caption2)
+                    .foregroundStyle(.tertiary)
+            }
+        }
+        .tag(section)
+        .contextMenu {
+            if section.isSensitive {
+                Button {
+                    lockManager.toggleSectionLock(section.rawValue)
+                } label: {
+                    Label(
+                        lockManager.isSectionLocked(section.rawValue) ? "Stop locking section" : "Always lock section",
+                        systemImage: "lock"
+                    )
+                }
+            }
         }
     }
 }

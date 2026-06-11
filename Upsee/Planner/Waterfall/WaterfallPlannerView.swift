@@ -147,7 +147,7 @@ struct WaterfallPlannerView: View {
             Text(value).font(.title3.monospacedDigit().weight(.medium)).foregroundStyle(tint)
         }
         .padding(12)
-        .background(RoundedRectangle(cornerRadius: 8).fill(Color.secondary.opacity(0.06)))
+        .glassPanel(cornerRadius: 14)
     }
 
     private func statAmount(_ label: String, _ amount: Decimal, tint: Color = .primary) -> some View {
@@ -156,6 +156,6 @@ struct WaterfallPlannerView: View {
             SecureAmount(amount: amount, tint: tint, font: .title3.monospacedDigit().weight(.medium))
         }
         .padding(12)
-        .background(RoundedRectangle(cornerRadius: 8).fill(Color.secondary.opacity(0.06)))
+        .glassPanel(cornerRadius: 14)
     }
 }

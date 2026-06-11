@@ -206,7 +206,7 @@ struct WealthProjectionView: View {
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding(10)
-        .background(RoundedRectangle(cornerRadius: 8).fill(Color.secondary.opacity(0.06)))
+        .glassPanel(cornerRadius: 14)
     }
 
     private func shortCurrency(_ d: Double) -> String {

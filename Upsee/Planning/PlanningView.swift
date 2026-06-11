@@ -280,9 +280,14 @@ struct SectionShell<Content: View>: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 14) {
-            Text(title).font(.title3.weight(.semibold))
+            Text(title)
+                .font(.headline.weight(.semibold))
+                .foregroundStyle(.primary.opacity(0.85))
             content
         }
+        .padding(18)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .glassPanel()
     }
 }
 
@@ -301,8 +306,12 @@ struct EmptyHint: View {
         .padding(14)
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(
-            RoundedRectangle(cornerRadius: 10, style: .continuous)
-                .fill(Color.secondary.opacity(0.04))
+            RoundedRectangle(cornerRadius: 12, style: .continuous)
+                .fill(Color.secondary.opacity(0.05))
+        )
+        .overlay(
+            RoundedRectangle(cornerRadius: 12, style: .continuous)
+                .strokeBorder(Color.secondary.opacity(0.10), style: StrokeStyle(lineWidth: 1, dash: [5, 4]))
         )
     }
 }

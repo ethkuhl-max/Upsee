@@ -131,7 +131,7 @@ struct AppDetailView: View {
         }
         .padding(12)
         .frame(maxWidth: .infinity, alignment: .leading)
-        .background(RoundedRectangle(cornerRadius: 10).fill(Color.secondary.opacity(0.06)))
+        .glassPanel(cornerRadius: 14)
     }
 
     private var repoSection: some View {
@@ -143,7 +143,7 @@ struct AppDetailView: View {
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .padding(14)
-                .background(RoundedRectangle(cornerRadius: 10).fill(Color.secondary.opacity(0.06)))
+                .glassPanel(cornerRadius: 14)
             } else if let report = repoHealth {
                 VStack(alignment: .leading, spacing: 8) {
                     RepoHealthCard(report: report)

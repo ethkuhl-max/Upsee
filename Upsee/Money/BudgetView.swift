@@ -92,7 +92,7 @@ struct BudgetView: View {
             SecureAmount(amount: amount, tint: tint, font: .title3.monospacedDigit().weight(.medium))
         }
         .padding(12)
-        .background(RoundedRectangle(cornerRadius: 8).fill(Color.secondary.opacity(0.06)))
+        .glassPanel(cornerRadius: 14)
     }
 }
 

@@ -142,7 +142,7 @@ struct ActivityFeedView: View {
             Text(value).font(.title3.monospacedDigit().weight(.medium)).foregroundStyle(tint)
         }
         .padding(12)
-        .background(RoundedRectangle(cornerRadius: 8).fill(Color.secondary.opacity(0.06)))
+        .glassPanel(cornerRadius: 14)
     }
 
     private func isWithin(days: Int, _ date: Date) -> Bool {

@@ -431,7 +431,7 @@ struct DealFinancialsView: View {
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding(12)
-        .background(RoundedRectangle(cornerRadius: 10).fill(Color.secondary.opacity(0.06)))
+        .glassPanel(cornerRadius: 14)
     }
 
     private func row(_ label: String, _ value: String, note: String? = nil) -> some View {

@@ -209,7 +209,7 @@ struct TransactionsView: View {
             }
         }
         .padding(16)
-        .background(RoundedRectangle(cornerRadius: 10).fill(Color.secondary.opacity(0.06)))
+        .glassPanel(cornerRadius: 14)
     }
 
     private func stat(_ label: String, _ value: String, tint: Color = .primary) -> some View {

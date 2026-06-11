@@ -90,7 +90,7 @@ struct DealDiligenceView: View {
             .font(.callout)
             .frame(minHeight: 120)
             .padding(8)
-            .background(RoundedRectangle(cornerRadius: 8).fill(Color.secondary.opacity(0.06)))
+            .glassPanel(cornerRadius: 14)
             .overlay(
                 RoundedRectangle(cornerRadius: 8).strokeBorder(Color.secondary.opacity(0.15))
             )
