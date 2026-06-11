@@ -49,6 +49,7 @@ struct MainView: View {
         case .decisions: DecisionsView()
         case .activity: ActivityFeedView()
         case .transactions: TransactionsView()
+        case .bills: BillsView()
         case .loans: LoansView()
         case .imports: ASCImportView()
         case .time: TimeView()
@@ -57,7 +58,7 @@ struct MainView: View {
 }
 
 enum UpseeSection: String, Hashable, CaseIterable, Identifiable {
-    case overview, clients, dashboard, apps, briefing, planning, health, wealth, decisions, activity, transactions, loans, imports, time
+    case overview, clients, dashboard, apps, briefing, planning, health, wealth, decisions, activity, transactions, bills, loans, imports, time
     var id: String { rawValue }
 
     var label: String {
@@ -73,6 +74,7 @@ enum UpseeSection: String, Hashable, CaseIterable, Identifiable {
         case .decisions: return "Decisions"
         case .activity: return "Activity"
         case .transactions: return "Transactions"
+        case .bills: return "Bills"
         case .loans: return "Loans"
         case .imports: return "Imports"
         case .time: return "Time"
@@ -92,6 +94,7 @@ enum UpseeSection: String, Hashable, CaseIterable, Identifiable {
         case .decisions: return "scale.3d"
         case .activity: return "waveform.path.ecg"
         case .transactions: return "list.bullet.rectangle.portrait"
+        case .bills: return "calendar.badge.clock"
         case .loans: return "creditcard"
         case .imports: return "tray.and.arrow.down"
         case .time: return "clock.arrow.circlepath"
@@ -101,7 +104,7 @@ enum UpseeSection: String, Hashable, CaseIterable, Identifiable {
     /// Sections that hold sensitive financial data — surfaced as defaults in lock settings.
     var isSensitive: Bool {
         switch self {
-        case .wealth, .transactions, .loans, .planning, .clients, .decisions: return true
+        case .wealth, .transactions, .loans, .planning, .clients, .decisions, .bills: return true
         default: return false
         }
     }

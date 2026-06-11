@@ -25,6 +25,7 @@ enum ActivityEventKind: String, CaseIterable, Hashable {
     case weeklyCommitmentClosed
     case reviewNeeded
     case dealAnalyzed
+    case dataImport
 
     var displayName: String {
         switch self {
@@ -39,6 +40,7 @@ enum ActivityEventKind: String, CaseIterable, Hashable {
         case .weeklyCommitmentClosed: return "Commitment Closed"
         case .reviewNeeded: return "Review Needed"
         case .dealAnalyzed: return "Deal Analyzed"
+        case .dataImport: return "Import"
         }
     }
 
@@ -55,6 +57,7 @@ enum ActivityEventKind: String, CaseIterable, Hashable {
         case .weeklyCommitmentClosed: return "flag.checkered"
         case .reviewNeeded: return "questionmark.diamond"
         case .dealAnalyzed: return "doc.text.magnifyingglass"
+        case .dataImport: return "tray.and.arrow.down.fill"
         }
     }
 
@@ -71,6 +74,7 @@ enum ActivityEventKind: String, CaseIterable, Hashable {
         case .weeklyCommitmentClosed: return .green
         case .reviewNeeded: return .orange
         case .dealAnalyzed: return .teal
+        case .dataImport: return .cyan
         }
     }
 }

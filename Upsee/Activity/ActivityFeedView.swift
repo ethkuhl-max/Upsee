@@ -12,6 +12,7 @@ struct ActivityFeedView: View {
     @Query(sort: \BriefingEntity.createdAt, order: .reverse) private var briefings: [BriefingEntity]
     @Query(sort: \WeeklyCommitment.weekStart, order: .reverse) private var commitments: [WeeklyCommitment]
     @Query private var deals: [DealEntity]
+    @Query(sort: \ImportLogEntry.importedAt, order: .reverse) private var imports: [ImportLogEntry]
 
     @State private var activeFilters: Set<ActivityEventKind> = []
     @State private var searchText: String = ""
@@ -27,7 +28,8 @@ struct ActivityFeedView: View {
             taxPayments: taxPayments,
             briefings: briefings,
             commitments: commitments,
-            deals: deals
+            deals: deals,
+            imports: imports
         )
         return ActivityEventBuilder.build(sources)
     }

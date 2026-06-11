@@ -51,6 +51,7 @@ struct WealthView: View {
         ScrollView {
             VStack(alignment: .leading, spacing: 28) {
                 netWorthHeader
+                fiSectionView
                 allocationSection
                 netWorthTrendSection
                 monteCarloSection
@@ -87,23 +88,23 @@ struct WealthView: View {
         HStack(spacing: 14) {
             HeadlineMetric(
                 label: "Net Worth",
-                value: currency(summary.netWorth),
+                value: currencyMasked(summary.netWorth),
                 detail: deltaDetail,
                 tint: summary.netWorth >= 0 ? .primary : .red
             )
             HeadlineMetric(
                 label: "Assets",
-                value: currency(summary.totalAssets),
+                value: currencyMasked(summary.totalAssets),
                 detail: "\(allocation.slices.count) categor\(allocation.slices.count == 1 ? "y" : "ies")"
             )
             HeadlineMetric(
                 label: "Liabilities",
-                value: currency(summary.totalLiabilities),
+                value: currencyMasked(summary.totalLiabilities),
                 detail: String(format: "%.0f%% leverage", summary.leverageRatio * 100)
             )
             HeadlineMetric(
                 label: "Liquid",
-                value: currency(liquidAssets),
+                value: currencyMasked(liquidAssets),
                 detail: liquidDetail
             )
         }
@@ -113,7 +114,7 @@ struct WealthView: View {
         guard snapshots.count >= 1, let latest = snapshots.first else { return "No snapshots yet" }
         let delta = summary.netWorth - latest.netWorth
         let sign = delta >= 0 ? "+" : ""
-        return "\(sign)\(currency(delta)) since \(relative(latest.date))"
+        return "\(sign)\(currencyMasked(delta)) since \(relative(latest.date))"
     }
 
     private var liquidDetail: String {
@@ -121,6 +122,16 @@ struct WealthView: View {
         let monthsCovered = NSDecimalNumber(decimal: liquidAssets).doubleValue
             / NSDecimalNumber(decimal: p.monthlyExpenses).doubleValue
         return String(format: "%.1fmo of expenses", monthsCovered)
+    }
+
+    private var fiSectionView: some View {
+        SectionShell(title: "Financial independence") {
+            FISection(
+                annualExpenses: (personalEntity?.monthlyExpenses ?? 0) * 12,
+                netWorth: summary.netWorth,
+                annualSavings: annualContribution
+            )
+        }
     }
 
     private var allocationSection: some View {

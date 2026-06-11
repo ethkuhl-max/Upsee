@@ -30,6 +30,8 @@ enum UpseeStore {
         Transaction.self,
         CategoryRule.self,
         Loan.self,
+        Bill.self,
+        Budget.self,
     ])
 
     static let modelContainer: ModelContainer = {

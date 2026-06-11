@@ -15,10 +15,11 @@ struct TransactionsView: View {
     @State private var categoryFilter: TxCategory?
     @State private var searchText: String = ""
 
-    enum TopTab: String, CaseIterable { case all, subscriptions, byCategory, importing
+    enum TopTab: String, CaseIterable { case all, budget, subscriptions, byCategory, importing
         var displayName: String {
             switch self {
             case .all: return "All"
+            case .budget: return "Budget"
             case .subscriptions: return "Subscriptions"
             case .byCategory: return "By Category"
             case .importing: return "Import"
@@ -34,6 +35,7 @@ struct TransactionsView: View {
                 tabBar
                 switch tab {
                 case .all: allList
+                case .budget: BudgetView()
                 case .subscriptions: SubscriptionsView(transactions: transactions)
                 case .byCategory: categoryBreakdown
                 case .importing: importTab

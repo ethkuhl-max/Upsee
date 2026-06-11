@@ -14,6 +14,7 @@ enum ActivityEventBuilder {
         var briefings: [BriefingEntity] = []
         var commitments: [WeeklyCommitment] = []
         var deals: [DealEntity] = []
+        var imports: [ImportLogEntry] = []
         var now: Date = Date()
         /// Stale-retro threshold (days). Decisions logged before this and still
         /// without an outcome emit a `reviewNeeded` event.
@@ -145,6 +146,18 @@ enum ActivityEventBuilder {
                     detail: commitment.outcome.isEmpty ? nil : commitment.outcome
                 ))
             }
+        }
+
+        for entry in s.imports {
+            events.append(.init(
+                id: "import-\(ObjectIdentifier(entry).hashValue)",
+                date: entry.importedAt,
+                kind: .dataImport,
+                entityKind: .portfolio,
+                entityLabel: entry.source.displayName,
+                title: "Imported \(entry.fileName)",
+                detail: entry.summary
+            ))
         }
 
         for deal in s.deals where deal.lastAnalyzedAt != nil {

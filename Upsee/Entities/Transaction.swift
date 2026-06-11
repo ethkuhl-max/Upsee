@@ -55,7 +55,8 @@ final class Transaction {
     var absAmount: Decimal { amount < 0 ? -amount : amount }
 }
 
-enum TxCategory: String, Codable, CaseIterable {
+enum TxCategory: String, Codable, CaseIterable, Identifiable {
+    var id: String { rawValue }
     case income, housing, food, transport, health, utilities
     case subscriptions, entertainment, shopping, education
     case savings, investment, taxes, fees
