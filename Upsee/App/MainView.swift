@@ -2,18 +2,37 @@ import SwiftUI
 
 struct MainView: View {
     @State private var section: UpseeSection? = .dashboard
+    @State private var showingLockSettings = false
+    @Environment(LockManager.self) private var lockManager
+
+    /// Drives auto-lock checks. Fires every 30s while the window is open.
+    private let activityTimer = Timer.publish(every: 30, on: .main, in: .common).autoconnect()
 
     var body: some View {
         NavigationSplitView {
-            Sidebar(selection: $section)
-                .navigationSplitViewColumnWidth(min: 180, ideal: 200, max: 240)
+            Sidebar(selection: $section, onOpenLockSettings: { showingLockSettings = true })
+                .navigationSplitViewColumnWidth(min: 200, ideal: 220, max: 260)
         } detail: {
             NavigationStack {
-                detail
+                SectionLockGate(
+                    sectionRawValue: (section ?? .dashboard).rawValue,
+                    sectionLabel: (section ?? .dashboard).label
+                ) {
+                    detail
+                }
             }
         }
         .navigationSplitViewStyle(.balanced)
         .task { NotificationService.requestAuthorization() }
+        .onAppear { lockManager.recordActivity() }
+        .onReceive(activityTimer) { _ in
+            lockManager.evaluateAutoLock()
+        }
+        .sheet(isPresented: $showingLockSettings) {
+            LockSettingsSheet().environment(lockManager)
+        }
+        // Any user interaction resets the inactivity clock.
+        .simultaneousGesture(TapGesture().onEnded { lockManager.recordActivity() })
     }
 
     @ViewBuilder
@@ -78,19 +97,100 @@ enum UpseeSection: String, Hashable, CaseIterable, Identifiable {
         case .time: return "clock.arrow.circlepath"
         }
     }
+
+    /// Sections that hold sensitive financial data — surfaced as defaults in lock settings.
+    var isSensitive: Bool {
+        switch self {
+        case .wealth, .transactions, .loans, .planning, .clients, .decisions: return true
+        default: return false
+        }
+    }
 }
 
 struct Sidebar: View {
     @Binding var selection: UpseeSection?
+    let onOpenLockSettings: () -> Void
+
+    @Environment(LockManager.self) private var lockManager
 
     var body: some View {
-        List(selection: $selection) {
-            ForEach(UpseeSection.allCases) { section in
-                Label(section.label, systemImage: section.systemImage)
+        VStack(spacing: 0) {
+            List(selection: $selection) {
+                ForEach(UpseeSection.allCases) { section in
+                    HStack(spacing: 6) {
+                        Label(section.label, systemImage: section.systemImage)
+                        if lockManager.isSectionLocked(section.rawValue) {
+                            Spacer()
+                            Image(systemName: "lock.fill")
+                                .font(.caption2)
+                                .foregroundStyle(.tertiary)
+                        }
+                    }
                     .tag(section)
+                    .contextMenu {
+                        if section.isSensitive {
+                            Button {
+                                lockManager.toggleSectionLock(section.rawValue)
+                            } label: {
+                                Label(
+                                    lockManager.isSectionLocked(section.rawValue) ? "Stop locking section" : "Always lock section",
+                                    systemImage: "lock"
+                                )
+                            }
+                        }
+                    }
+                }
             }
+            .listStyle(.sidebar)
+            .navigationTitle("Upsee")
+
+            LockControlsFooter(onOpenSettings: onOpenLockSettings)
         }
-        .listStyle(.sidebar)
-        .navigationTitle("Upsee")
+    }
+}
+
+private struct LockControlsFooter: View {
+    let onOpenSettings: () -> Void
+    @Environment(LockManager.self) private var lockManager
+
+    var body: some View {
+        VStack(spacing: 6) {
+            Divider()
+            HStack(spacing: 6) {
+                Button {
+                    lockManager.togglePrivacyMode()
+                } label: {
+                    Image(systemName: lockManager.isPrivacyMode ? "eye.slash.fill" : "eye")
+                        .frame(width: 14)
+                }
+                .buttonStyle(.borderless)
+                .help(lockManager.isPrivacyMode ? "Show amounts" : "Hide amounts (privacy mode)")
+                .foregroundStyle(lockManager.isPrivacyMode ? Color.blue : .secondary)
+
+                Button {
+                    lockManager.lock()
+                } label: {
+                    Image(systemName: "lock.fill").frame(width: 14)
+                }
+                .buttonStyle(.borderless)
+                .help("Lock now")
+                .foregroundStyle(.secondary)
+
+                Button(action: onOpenSettings) {
+                    Image(systemName: "gearshape").frame(width: 14)
+                }
+                .buttonStyle(.borderless)
+                .help("Lock & privacy settings")
+                .foregroundStyle(.secondary)
+
+                Spacer()
+
+                if lockManager.isPrivacyMode {
+                    Text("PRIVACY").font(.caption2.weight(.bold)).foregroundStyle(Color.blue)
+                }
+            }
+            .padding(.horizontal, 12)
+            .padding(.vertical, 8)
+        }
     }
 }
