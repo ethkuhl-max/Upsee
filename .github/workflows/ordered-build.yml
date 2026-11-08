@@ -1,0 +1,42 @@
+name: Ordered build
+
+on:
+  push:
+    branches: [main]
+
+# One run at a time per branch; queued runs wait instead of cancelling the one in progress.
+concurrency:
+  group: build-${{ github.ref }}
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    env:
+      BASE: "1" # build number when this workflow was added; next build = BASE + 1
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Compute build number
+        run: echo "BUILD=$((BASE + ${{ github.run_number }}))" >> "$GITHUB_ENV"
+
+      - name: Stamp build number into the app
+        run: |
+          git ls-files -z '*project.yml' ':(exclude)Tests/**' ':(exclude)Packages/**' \
+            | xargs -0 -r sed -i -E "s/(CURRENT_PROJECT_VERSION: )\"?[0-9]+\"?/\1\"$BUILD\"/"
+          git ls-files -z '*.pbxproj' ':(exclude)Packages/**' \
+            | xargs -0 -r sed -i -E "s/(CURRENT_PROJECT_VERSION = )[0-9]+;/\1$BUILD;/"
+          git ls-files -z '*Info.plist' ':(exclude)Packages/**' ':(exclude)design*/**' \
+            | xargs -0 -r perl -0pi -e 's#(<key>CFBundleVersion</key>\s*<string>)\d+(</string>)#${1}'"$BUILD"'${2}#'
+          git diff --stat
+
+      - name: Tag build
+        run: |
+          if git ls-remote --exit-code --tags origin "refs/tags/build-$BUILD" >/dev/null; then
+            echo "build-$BUILD already exists (re-run); not re-tagging."; exit 0
+          fi
+          git tag "build-$BUILD" "$GITHUB_SHA"
+          git push origin "build-$BUILD"
