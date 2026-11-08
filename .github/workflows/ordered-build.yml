@@ -26,7 +26,7 @@ jobs:
       - name: Stamp build number into the app
         run: |
           git ls-files -z '*project.yml' ':(exclude)Tests/**' ':(exclude)Packages/**' \
-            | xargs -0 -r sed -i -E "s/(CURRENT_PROJECT_VERSION: )\"?[0-9]+\"?/\1\"$BUILD\"/"
+            | xargs -0 -r sed -i -E "s/(CURRENT_PROJECT_VERSION: )\"?[0-9]+\"?/\1\"$BUILD\"/;s/(CFBundleVersion: )\"?[0-9]+\"?/\1\"$BUILD\"/"
           git ls-files -z '*.pbxproj' ':(exclude)Packages/**' \
             | xargs -0 -r sed -i -E "s/(CURRENT_PROJECT_VERSION = )[0-9]+;/\1$BUILD;/"
           git ls-files -z '*Info.plist' ':(exclude)Packages/**' ':(exclude)design*/**' \
